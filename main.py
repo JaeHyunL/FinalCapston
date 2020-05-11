@@ -22,8 +22,8 @@ def gen():
     while True:
         rval, frame = vc.read()
         cv2.imwrite('pic.jpg', frame)
-        
-        #제네레이터를 사용하여 객채를읽어옴 
+
+        # 제네레이터를 사용하여 객채를읽어옴
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + open('pic.jpg', 'rb').read() + b'\r\n')
 
