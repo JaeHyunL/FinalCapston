@@ -1,11 +1,14 @@
 from flask import Flask, render_template, Response
+from flask_socketio import SocketIO, send, emit
 import cv2
 import socket
 import io
-import facerecognition 
+import facerecognition
 # Flask 서버 설정
 app = Flask(__name__)
 # cv2 사용 0번째 카메라로 video캡쳐 시작
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 vc = cv2.VideoCapture(0)
 
 
@@ -13,7 +16,17 @@ vc = cv2.VideoCapture(0)
 def index():
     # 비디오 캡처 시작
     """Video streaming ."""
-    return render_template('index.html')
+    return render_template('test.html')
+
+
+def messageReceived(methods=['GET', 'POST']):
+    print('message was received!!!')
+
+
+@socketio.on('my event')
+def handle_my_custom_event(json, methods=['GET', 'POST']):
+    print('received my event: ' + str(json))
+    socketio.emit('my response', json, callback=messageReceived)
 
 
 def gen():
@@ -37,4 +50,4 @@ def video_feed():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, port=5000, debug=True)
