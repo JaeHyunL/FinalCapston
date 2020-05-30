@@ -1,21 +1,19 @@
 import cv2
 import numpy as np
-import socket
-import sys
 import pickle
+import socket
 import struct
+import sys
 
-cap=cv2.VideoCapture(0)
-clientsocket=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-clientsocket.connect(('localhost',8089))
+"""사용자 실시간 얼굴 서버 전송로직"""
+
+cap = cv2.VideoCapture(0)
+clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+clientsocket.connect(('localhost', 9999))
 
 while True:
-    ret,frame=cap.read()
-    # Serialize frame
+
+    ret, frame = cap.read()
     data = pickle.dumps(frame)
-
-    # Send message length first
-    message_size = struct.pack("L", len(data)) ### CHANGED
-
-    # Then data
+    message_size = struct.pack("L", len(data))  
     clientsocket.sendall(message_size + data)
