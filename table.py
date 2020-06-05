@@ -6,7 +6,7 @@ class CRUDdatabase(Database):
     def getImage(self, no):
 
         sql = "SELECT image_file_str "
-        sql += "FROM images "
+        sql += "FROM student "
         sql += "WHERE user_no={};".format(no)
         result = {}
         try:
