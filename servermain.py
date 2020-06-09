@@ -1,5 +1,8 @@
 import cv2
+import face_recognition
+import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 import pickle
 import socket
 import struct
@@ -9,12 +12,13 @@ from database import Database
 from threading import Thread
 from table import CRUDdatabase
 
+
 """ 사용자  받은 
 데이터 이미지 처리"""
 
 
 def getDataToImage(HOST, PORT):
- 
+    #global frame
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((HOST, PORT))
     s.listen(10)
@@ -40,11 +44,15 @@ def getDataToImage(HOST, PORT):
 
         frame = pickle.loads(frame_data)
         cv2.imwrite('./UserImage/clientJPG.jpg', frame)
-        time.sleep(0.1)
+        getImageDataToDB(frame)
         cv2.waitKey(1)
+        #ad = CRUDdatabase()
+        #aq = "./UserImage/client"
+        # ad.insertImage(str(aq))
 
 
 """디비에서 이미지 가져오기"""
+
 
 def getDbImage():
     ad = CRUDdatabase()
@@ -52,6 +60,20 @@ def getDbImage():
     img = cv2.imread(a['image_file_str'])
     plt.imshow(img)
     plt.show()
+
+
+def getImageDataToDB(frame):
+    ad = CRUDdatabase()
+    face_landmarks_list = face_recognition.face_landmarks(frame)
+    if face_landmarks_list:
+
+        face_locations = face_recognition.face_locations(frame)
+        face_encodings = face_recognition.face_encodings(frame, face_locations)
+        face_encodings = np.asarray(face_encodings).T
+        df = pd.DataFrame(face_encodings)
+        ad.insertcsv(df)
+        df.to_csv('./UserImage/captured_feature_data.csv',
+                  index=False, header=None)
 
 
 if __name__ == "__main__":
