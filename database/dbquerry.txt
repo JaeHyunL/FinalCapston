@@ -1,0 +1,14 @@
+-- capston 데이터베이스 구조 내보내기
+CREATE DATABASE IF NOT EXISTS `capston` /*!40100 DEFAULT CHARACTER SET latin1 */;
+USE `capston`;
+
+-- 테이블 capston.student 구조 내보내기
+CREATE TABLE IF NOT EXISTS `student` (
+  `user_no` int(11) NOT NULL AUTO_INCREMENT,
+  `image_file_str` varchar(50) DEFAULT NULL,
+  `student_name` varchar(50) DEFAULT NULL,
+  `student_department` varchar(50) DEFAULT NULL,
+  `student_number` varchar(50) DEFAULT NULL,
+  `student_characteristic` varchar(5000) DEFAULT NULL,
+  PRIMARY KEY (`user_no`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=latin1;

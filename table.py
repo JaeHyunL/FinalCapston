@@ -2,9 +2,9 @@ from database import Database
 
 
 class CRUDdatabase(Database):
-    """DB 이미지 가져오기 """
 
-    def getImage(self, no):
+    """DB 이미지 가져오기 """
+    def get_Image(self, no):
 
         sql = "SELECT image_file_str "
         sql += "FROM student "
@@ -20,8 +20,7 @@ class CRUDdatabase(Database):
         return result
 
     """DB 이미지 저장 """
-
-    def insertImage(self, img_str):
+    def insert_Image(self, img_str):
 
         sql = "INSERT INTO student(image_file_str)"
         sql += " VALUES('{}');".format(img_str)
@@ -35,7 +34,7 @@ class CRUDdatabase(Database):
 
         return result
 
-    def insertcsv(self, characteristic):
+    def insert_FaceDifference(self, characteristic):
 
         sql = "INSERT INTO student(student_characteristic)"
         sql += " values('{}');".format(characteristic)
