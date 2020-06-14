@@ -3,14 +3,8 @@ import socket
 import io
 import hashlib
 
-from flask import jsonify, Flask, render_template, Response, request, redirect, make_response
+from flask import jsonify, Flask, render_template, Response, request, redirect, make_response, session
 from flask_socketio import SocketIO, send
-from flask_jwt_extended import (
-    jwt_required, create_access_token,
-    jwt_refresh_token_required, create_refresh_token,
-    get_jwt_identity, set_access_cookies,
-    set_refresh_cookies, unset_jwt_cookies
-)
 from signtable import Signdatabase
 import jwt
 
@@ -43,6 +37,7 @@ def sigUP():
 @app.route('/signup/Registration', methods=['GET', 'POST'])
 def registration():
     """Video streaming ."""
+    #저장로직 
     if request.method == 'POST':
         print('애초에여기타긴타냐?')
         vc.release()
@@ -58,18 +53,13 @@ def signIn():
         pw = hashlib.sha256(request.form['password'].encode())
         pw = pw.hexdigest()
         userid = request.form['username']
-
         result = db.auth(userid, pw)
-        print(result)
-        access_token = create_access_token(identity=userid)
-        refresh_token = create_refresh_token(identity=userid)
 
-        # Set the JWT cookies in the response
-        resp = jsonify({'login': result})
-        #TODO jwt 쿠키 인증하는로직 구현 
-        set_access_cookies(resp, access_token)
-        set_refresh_cookies(resp, refresh_token)
-        return resp
+        if result == True:
+            session[userid] = userid
+            return 'counter:' + str(session[userid])
+        elif result == False:
+            print('인증실패')
     return render_template('signin.html')
 
 # def sign_tokken():
@@ -78,7 +68,9 @@ def signIn():
 def gen():
     # 비디오 캡처기능
     """Video streaming generator function."""
+
     while True:
+        #TODO 무한루프 꺨 방법을 생각해야대는데 
         rval, frame = vc.read()
         cv2.imwrite('./UserImage/pic.jpg', frame)
        # print(frame)
@@ -92,6 +84,12 @@ def video_feed():
     """비디오스트리밍 경로 .{{ url_for('video_feed') }} 지정."""
     return Response(gen(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/logout', methods=['GET'])
+def logout():
+    # TODO 로그아웃 이벤트처리
+    pass
 
 
 if __name__ == '__main__':
