@@ -14,7 +14,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'BCODE_Flask'
 socketio = SocketIO(app)
 vc = cv2.VideoCapture(0)
-tempSession = ''
+tmepUserID = ''
 
 
 @app.route('/signup/info', methods=['GET', 'POST'])
@@ -59,10 +59,8 @@ def signIn():
         if result == True:
 
             session[userid] = userid
-            resp = make_response("Cookie Setting Complete")
-            resp.set_cookie('userID', userid)
-            print(resp)
-            print(tempSession)
+            global tmepUserID
+            tmepUserID = userid
             return 'counter:' + str(session[userid])
         elif result == False:
             print('인증실패')
@@ -74,14 +72,16 @@ def signIn():
 def gen():
     # 비디오 캡처기능
     """Video streaming generator function."""
+    os.makedirs('./UserImage/{}'.format(tmepUserID), exist_ok=True)
+
     while True:
-        # TODO 무한루프 꺨 방법을 생각해야대는데
         rval, frame = vc.read()
-        cv2.imwrite('./UserImage/pic.jpg', frame)
-        print(session['userid'])
-        # 제네레이터를 사용하여 객채를읽어옴
+        cv2.imwrite(
+            './UserImage/{0}/{1}.jpg'.format(tmepUserID, tmepUserID+'firstImage'), frame)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + open('./UserImage/pic.jpg', 'rb').read() + b'\r\n')
+        if cv2.waitKey(1) & 0xFF == 27:
+            break
 
 
 @app.route('/video_feed')
