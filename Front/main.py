@@ -73,13 +73,13 @@ def gen():
     # 비디오 캡처기능
     """Video streaming generator function."""
     os.makedirs('./UserImage/{}'.format(tmepUserID), exist_ok=True)
-
-    while True:
+    vc = cv2.VideoCapture(0)
+    while (vc.isOpened()):
         rval, frame = vc.read()
         cv2.imwrite(
             './UserImage/{0}/{1}.jpg'.format(tmepUserID, tmepUserID+'firstImage'), frame)
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + open('./UserImage/pic.jpg', 'rb').read() + b'\r\n')
+               b'Content-Type: image/jpeg\r\n\r\n' + open('./UserImage/{0}/{1}.jpg'.format(tmepUserID, tmepUserID+'firstImage'), 'rb').read() + b'\r\n')
         if cv2.waitKey(1) & 0xFF == 27:
             break
 
