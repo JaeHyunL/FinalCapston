@@ -33,6 +33,15 @@
           <th>비밀번호</th>
           <td><input type="password" name="student_pass" /></td>
         </tr>
+        <tr>
+          <th
+            action="http://localhost:5000/file-upload"
+            method="POST"
+            enctype="multipart/form-data"
+          />
+          <input type="file" name="file" />
+          <input type="submit" />
+        </tr>
         <td colspan="2" align="center">
           <input type="submit" value="회원가입" />
           <input type="reset" value="취소" />

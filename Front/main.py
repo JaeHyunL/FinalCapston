@@ -2,10 +2,10 @@ import cv2
 import socket
 import io
 import hashlib
-
+import os
 from flask import jsonify, Flask, render_template, Response, request, redirect, make_response, session
 from flask_socketio import SocketIO, send
-from signtable import Signdatabase
+from sitable import Signdatabase
 import jwt
 
 # Flask 서버 설정
@@ -14,6 +14,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'BCODE_Flask'
 socketio = SocketIO(app)
 vc = cv2.VideoCapture(0)
+tempSession = ''
 
 
 @app.route('/signup/info', methods=['GET', 'POST'])
@@ -37,7 +38,7 @@ def sigUP():
 @app.route('/signup/Registration', methods=['GET', 'POST'])
 def registration():
     """Video streaming ."""
-    #저장로직 
+    # 저장로직
     if request.method == 'POST':
         print('애초에여기타긴타냐?')
         vc.release()
@@ -56,7 +57,12 @@ def signIn():
         result = db.auth(userid, pw)
 
         if result == True:
+
             session[userid] = userid
+            resp = make_response("Cookie Setting Complete")
+            resp.set_cookie('userID', userid)
+            print(resp)
+            print(tempSession)
             return 'counter:' + str(session[userid])
         elif result == False:
             print('인증실패')
@@ -68,12 +74,11 @@ def signIn():
 def gen():
     # 비디오 캡처기능
     """Video streaming generator function."""
-
     while True:
-        #TODO 무한루프 꺨 방법을 생각해야대는데 
+        # TODO 무한루프 꺨 방법을 생각해야대는데
         rval, frame = vc.read()
         cv2.imwrite('./UserImage/pic.jpg', frame)
-       # print(frame)
+        print(session['userid'])
         # 제네레이터를 사용하여 객채를읽어옴
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + open('./UserImage/pic.jpg', 'rb').read() + b'\r\n')
@@ -86,10 +91,12 @@ def video_feed():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-@app.route('/logout', methods=['GET'])
+@app.route('/logout')
 def logout():
-    # TODO 로그아웃 이벤트처리
-    pass
+    # remove the username from the session if it is there
+
+    print(session.pop('username', None))
+    return render_template('signin.html')
 
 
 if __name__ == '__main__':
