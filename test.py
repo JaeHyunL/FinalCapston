@@ -1,2 +1,2 @@
-import os
-os.mkdir('./UserImage/{}'.format('gg'))
+soulkey = 'asdf'
+print(soulkey[0])
