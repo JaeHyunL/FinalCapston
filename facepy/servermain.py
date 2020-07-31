@@ -2,6 +2,7 @@ import cv2
 import face_recognition
 import numpy as np
 import matplotlib.pyplot as plt
+import hashlib
 import pandas as pd
 import pickle
 import socket
@@ -19,6 +20,10 @@ def getDataToImage(HOST, PORT):
     conn, addr = s.accept()
     data = b''
     payload_size = struct.calcsize("L")
+    id, pw = conn.recv(1024).decode().split(',')
+    #TODO 로그인 성공실패 여부 클라이언트 전송 
+   # if login(id, pw) == True:
+    #    s.send('True'.encode())
     while True:
 
         while len(data) < payload_size:
@@ -30,13 +35,13 @@ def getDataToImage(HOST, PORT):
         # Retrieve all data based on message size
         while len(data) < msg_size:
             data += conn.recv(4096)
-
         frame_data = data[:msg_size]
         data = data[msg_size:]
-
         frame = pickle.loads(frame_data)
         print(frame)
         getImageDataToDB(frame)
+#    elif login(id, pw) == False:
+#        s.send('False'.encode())
 
 
 """디비에서 이미지 가져오기"""
@@ -62,6 +67,17 @@ def attendance():
     # 디비 구조가 클래스 코드로 비교해서
     #
     pass
+
+
+def login(id, pw):
+
+    db = CRUDdatabase()
+    pw = hashlib.sha256(pw.encode())
+    pw = pw.hexdigest()
+    if db.login(id, pw) == True:
+        return True
+    else:
+        return False
 
 
 if __name__ == "__main__":

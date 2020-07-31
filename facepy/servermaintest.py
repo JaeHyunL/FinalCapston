@@ -24,7 +24,7 @@ def getDataToImage(HOST, PORT):
     s.listen(10)
 
     conn, addr = s.accept()
-
+    print(s.accept())
     data = b''
     payload_size = struct.calcsize("L")
 
@@ -38,12 +38,12 @@ def getDataToImage(HOST, PORT):
         # Retrieve all data based on message size
         while len(data) < msg_size:
             data += conn.recv(4096)
-
+        
         frame_data = data[:msg_size]
         data = data[msg_size:]
 
         frame = pickle.loads(frame_data)
-        cv2.imwrite('./UserImage/clientJPG.jpg', frame)
+        cv2.imwrite('./UserImage/firstImage.jpg', frame)
         cv2.imshow("good", frame)
         # insert_Image(frame)
         # cv2.waitKey(1)

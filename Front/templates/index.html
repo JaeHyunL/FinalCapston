@@ -5,6 +5,8 @@
   <body>
     <h1>기본이미지 저장</h1>
     <img src="{{ url_for('video_feed') }}" />
-    <input type="submit" value="저장" />
+    <form name="auth" method="post">
+      <input type="submit" value="저장" />
+    </form>
   </body>
 </html>
