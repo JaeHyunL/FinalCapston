@@ -35,11 +35,12 @@ class CRUDdatabase(Database):
             result = {"error": "{}".format(e)}
 
         return result
+# 얼굴 특징값 저장
+    def insert_FaceDifference(self, characteristic, userName):
 
-    def insert_FaceDifference(self, characteristic):
-
-        sql = "INSERT INTO student(student_characteristic)"
-        sql += " values('{}');".format(characteristic)
+        sql = "INSERT INTO student(student_characteristic,student_name)"
+        sql += " values('{}','{}');".format(characteristic, userName)
+        print(sql)
         result = None
         try:
             self.cursor.execute(sql)
@@ -48,6 +49,7 @@ class CRUDdatabase(Database):
             result = {"error": "{}".format(e)}
 
         return result
+# 로그인
 
     def login(self, id, passwd):
         sql = "SELECT student_ID,pw "
@@ -62,4 +64,18 @@ class CRUDdatabase(Database):
         except Exception as e:
             return {"error": "{}".format(e)}
         print(result)
+        return result
+# 유저 정보 조회
+
+    def userLookup(self, id):
+        sql = "SELECT * FROM info WHERE student_ID='{}'".format(id)
+        result = None
+        try:
+            self.cursor.execute(sql)
+            self.db.commit()
+            result = self.cursor.fetchall()
+
+        except Exception as e:
+            result = {"error": "{}".format(e)}
+
         return result

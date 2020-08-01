@@ -21,25 +21,23 @@ def getDataToImage(HOST, PORT):
     data = b''
     payload_size = struct.calcsize("L")
     id, pw = conn.recv(1024).decode().split(',')
-    #TODO 로그인 성공실패 여부 클라이언트 전송 
-   # if login(id, pw) == True:
-    #    s.send('True'.encode())
-    while True:
 
-        while len(data) < payload_size:
-            data += conn.recv(4096)
-        packed_msg_size = data[:payload_size]
-        data = data[payload_size:]
-        msg_size = struct.unpack("L", packed_msg_size)[0]  # CHANGED
-
-        # Retrieve all data based on message size
-        while len(data) < msg_size:
-            data += conn.recv(4096)
-        frame_data = data[:msg_size]
-        data = data[msg_size:]
-        frame = pickle.loads(frame_data)
-        print(frame)
-        getImageDataToDB(frame)
+    if login(id, pw) == True:
+        conn.sendall('True'.encode())
+        userName =userNamelookup(id)
+        while True:
+            while len(data) < payload_size:
+                data += conn.recv(4096)
+            packed_msg_size = data[:payload_size]
+            data = data[payload_size:]
+            msg_size = struct.unpack("L", packed_msg_size)[0]
+            while len(data) < msg_size:
+                data += conn.recv(4096)
+            frame_data = data[:msg_size]
+            data = data[msg_size:]
+            frame = pickle.loads(frame_data)
+    #     print(frame)
+            getImageDataToDB(frame,userName)
 #    elif login(id, pw) == False:
 #        s.send('False'.encode())
 
@@ -55,9 +53,9 @@ def getDbImage():
     plt.show()
 
 
-def getImageDataToDB(frame):
+def getImageDataToDB(frame,userName):
     db = CRUDdatabase()
-    db.insert_FaceDifference(frame)
+    db.insert_FaceDifference(frame,userName)
 
 
 def attendance():
@@ -78,6 +76,13 @@ def login(id, pw):
         return True
     else:
         return False
+
+
+def userNamelookup(id):
+    db = CRUDdatabase()
+    userInfo = db.userLookup(id)
+    userInfo = dict(*userInfo)
+    return userInfo['user_name']
 
 
 if __name__ == "__main__":
