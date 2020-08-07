@@ -26,7 +26,7 @@ class CRUDdatabase(Database):
 
         sql = "INSERT INTO student(image_file_str)"
         sql += " VALUES('{}');".format(img_str)
-        print(sql)
+        
         result = None
         try:
             self.cursor.execute(sql)
@@ -40,7 +40,7 @@ class CRUDdatabase(Database):
 
         sql = "INSERT INTO student(student_characteristic,student_name)"
         sql += " values('{}','{}');".format(characteristic, userName)
-        print(sql)
+        
         result = None
         try:
             self.cursor.execute(sql)
@@ -63,7 +63,7 @@ class CRUDdatabase(Database):
 
         except Exception as e:
             return {"error": "{}".format(e)}
-        print(result)
+        
         return result
 # 유저 정보 조회
 

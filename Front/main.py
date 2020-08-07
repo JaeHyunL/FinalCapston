@@ -7,7 +7,7 @@ from flask import jsonify, Flask, render_template, Response, request, redirect, 
 from flask_socketio import SocketIO, send
 from sitable import Signdatabase
 import jwt
-
+from clientMain2 import clientExe
 # Flask 서버 설정
 app = Flask(__name__)
 # cv2 사용 0번째 카메라로 video캡쳐 시작
@@ -46,7 +46,7 @@ def registration():
     return render_template('index.html')
 
 
-# TODO 로그인 인증 세션 발급 후 출석인증 버튼 누르면 AI 판단 프로그램 실행 !
+# TODO 로그인 인증 세션 발급 후 
 @app.route("/signin", methods=['GET', 'POST'])
 def signIn():
     if request.method == 'POST':
@@ -97,6 +97,15 @@ def logout():
 
     print(session.pop('username', None))
     return render_template('signin.html')
+
+#TODO 세션 발급 후 세션인증 되었을때만 처리 로직
+#TODO 사용자가 누군지 알려줘야함 ^^ 
+@app.route('/ClientOpen', methods=['GET', 'POST'])
+def clientAction():
+    if request.method == 'POST':
+
+        clientExe()
+    return render_template('action.html')
 
 
 if __name__ == '__main__':

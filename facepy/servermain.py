@@ -24,7 +24,8 @@ def getDataToImage(HOST, PORT):
 
     if login(id, pw) == True:
         conn.sendall('True'.encode())
-        userName =userNamelookup(id)
+        userName = userNamelookup(id)
+        print('여기탐')
         while True:
             while len(data) < payload_size:
                 data += conn.recv(4096)
@@ -36,10 +37,11 @@ def getDataToImage(HOST, PORT):
             frame_data = data[:msg_size]
             data = data[msg_size:]
             frame = pickle.loads(frame_data)
-    #     print(frame)
-            getImageDataToDB(frame,userName)
-#    elif login(id, pw) == False:
-#        s.send('False'.encode())
+            
+            print(frame)
+            insertImageDataToDB(frame, userName)
+    elif login(id, pw) == False:
+        conn.sendall('False'.encode())
 
 
 """디비에서 이미지 가져오기"""
@@ -53,9 +55,9 @@ def getDbImage():
     plt.show()
 
 
-def getImageDataToDB(frame,userName):
+def insertImageDataToDB(frame, userName):
     db = CRUDdatabase()
-    db.insert_FaceDifference(frame,userName)
+    db.insert_FaceDifference(frame, userName)
 
 
 def attendance():
@@ -86,4 +88,5 @@ def userNamelookup(id):
 
 
 if __name__ == "__main__":
+
     getDataToImage("127.0.0.1", 9999)

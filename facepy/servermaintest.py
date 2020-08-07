@@ -77,7 +77,7 @@ def getImageDataToDB(frame):
    #     cv2.imshow(frame)
         if cv2.waitKey(1) & 0xFF == ord('p'):
             cv2.imwrite('./UserImage/tty.jpg', frame)
-            # cv2.imshow(frame)
+            cv2.imshow(frame)
 
         #df = pd.DataFrame(face_encodings)
         # ad.insertcsv(df)
