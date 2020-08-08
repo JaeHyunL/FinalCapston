@@ -30,8 +30,4 @@ class Signdatabase(Database):
 
         except Exception as e:
             return {"error": "{}".format(e)}
-        print(result)
         return result
-
-    # def get_studentInfo(self, id):
-    #    sql = "SELECT  "

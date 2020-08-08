@@ -1,3 +1,4 @@
+import base64
 import cv2
 import socket
 import io
@@ -7,10 +8,9 @@ from flask import jsonify, Flask, render_template, Response, request, redirect, 
 from flask_socketio import SocketIO, send
 from sitable import Signdatabase
 import jwt
-from clientMain2 import clientExe
-# Flask 서버 설정
+from userClient import clientExe
+
 app = Flask(__name__)
-# cv2 사용 0번째 카메라로 video캡쳐 시작
 app.config['SECRET_KEY'] = 'BCODE_Flask'
 socketio = SocketIO(app)
 vc = cv2.VideoCapture(0)
@@ -34,11 +34,10 @@ def sigUP():
     return render_template('signup.html')
 
 
-# TODO 버튼 클릭 이벤트처리
+# TODO 저장로직
 @app.route('/signup/Registration', methods=['GET', 'POST'])
 def registration():
     """Video streaming ."""
-    # 저장로직
     if request.method == 'POST':
         print('애초에여기타긴타냐?')
         vc.release()
@@ -46,27 +45,31 @@ def registration():
     return render_template('index.html')
 
 
-# TODO 로그인 인증 세션 발급 후 
 @app.route("/signin", methods=['GET', 'POST'])
 def signIn():
-    if request.method == 'POST':
-        db = Signdatabase()
-        pw = hashlib.sha256(request.form['password'].encode())
-        pw = pw.hexdigest()
-        userid = request.form['username']
-        result = db.auth(userid, pw)
+    if cookie_status() == b'':
+        if request.method == 'POST':
+            db = Signdatabase()
+            pw = hashlib.sha256(request.form['password'].encode())
+            pw = pw.hexdigest()
+            print(request.form)
+            userid = request.form['student_ID']
+            result = db.auth(userid, pw)
 
-        if result == True:
+            if result == True:
+                userid = userid.encode('UTF-8')
+                userid = base64.b64encode(userid)
+                custom_resp = Response("COkkie 설정")
+                custom_resp.set_cookie("USERID", userid)
 
-            session[userid] = userid
-            global tmepUserID
-            tmepUserID = userid
-            return 'counter:' + str(session[userid])
-        elif result == False:
-            print('인증실패')
+                global tmepUserID
+                tmepUserID = userid
+                return custom_resp
+            elif result == False:
+                return '아이디 또는 비밀번호가 다릅니다. '
+    elif cookie_status != b'':
+        return '이미 로그인 되어져 있습니다! '
     return render_template('signin.html')
-
-# def sign_tokken():
 
 
 def gen():
@@ -93,19 +96,26 @@ def video_feed():
 
 @app.route('/logout')
 def logout():
-    # remove the username from the session if it is there
+    custom_resp = Response("COOKIE 제거")
+    custom_resp.set_cookie('USERID', expires=0)
+    return custom_resp
 
-    print(session.pop('username', None))
-    return render_template('signin.html')
-
-#TODO 세션 발급 후 세션인증 되었을때만 처리 로직
-#TODO 사용자가 누군지 알려줘야함 ^^ 
+# TODO 세션 발급 후 세션인증 되었을때만 처리 로직
+# TODO 사용자가 누군지 알려줘야함 ^^
 @app.route('/ClientOpen', methods=['GET', 'POST'])
 def clientAction():
     if request.method == 'POST':
 
         clientExe()
     return render_template('action.html')
+
+
+# 쿠키 값 확인 함수
+@app.route("/loginstatus")
+def cookie_status():
+    tempstr = request.cookies.get('USERID', '빈문자열')
+    tempstr = tempstr.encode("UTF-8")
+    return base64.b64decode(tempstr)
 
 
 if __name__ == '__main__':
