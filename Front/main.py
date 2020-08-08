@@ -110,7 +110,7 @@ def clientAction():
     return render_template('action.html')
 
 
-# 쿠키 값 확인 함수
+# 쿠키 값 확인 함수.
 @app.route("/loginstatus")
 def cookie_status():
     tempstr = request.cookies.get('USERID', '빈문자열')
