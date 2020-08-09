@@ -15,6 +15,10 @@ app.config['SECRET_KEY'] = 'BCODE_Flask'
 socketio = SocketIO(app)
 vc = cv2.VideoCapture(0)
 
+#TODO 네브바 필요 
+#TODO 화면전환 redirect 동적
+#TODO 출결 관리 페이지 
+#TODO 켐 인식 돌리는거 Break 문 필요 
 
 @app.route('/signup/info', methods=['GET', 'POST'])
 def sigUP():
@@ -102,13 +106,15 @@ def logout():
     custom_resp.set_cookie('USERID', expires=0)
     return custom_resp
 
-# TODO 세션 발급 후 세션인증 되었을때만 처리 로직
-# TODO 사용자가 누군지 알려줘야함 ^^
+
 @app.route('/ClientOpen', methods=['GET', 'POST'])
 def clientAction():
-    if request.method == 'POST':
+    if login_status() == False:
+        if request.method == 'POST':
 
-        clientExe()
+            clientExe(cookie_status())
+    elif login_status() == True:
+        redirect('/signin')
     return render_template('action.html')
 
 

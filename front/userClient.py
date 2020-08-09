@@ -12,7 +12,7 @@ import sys
 
 # USER GUI 구현
 
-def clientExe():
+def clientExe(userID):
     cap = cv2.VideoCapture(0)
     clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     clientsocket.connect(('localhost', 9999))
