@@ -21,27 +21,27 @@ def getDataToImage(HOST, PORT):
     data = b''
     payload_size = struct.calcsize("L")
     id, pw = conn.recv(1024).decode().split(',')
-    #TODO 로그인 성공실패 여부 클라이언트 전송 
-   # if login(id, pw) == True:
-    #    s.send('True'.encode())
-    while True:
 
-        while len(data) < payload_size:
-            data += conn.recv(4096)
-        packed_msg_size = data[:payload_size]
-        data = data[payload_size:]
-        msg_size = struct.unpack("L", packed_msg_size)[0]  # CHANGED
-
-        # Retrieve all data based on message size
-        while len(data) < msg_size:
-            data += conn.recv(4096)
-        frame_data = data[:msg_size]
-        data = data[msg_size:]
-        frame = pickle.loads(frame_data)
-        print(frame)
-        getImageDataToDB(frame)
-#    elif login(id, pw) == False:
-#        s.send('False'.encode())
+    if login(id, pw) == True:
+        conn.sendall('True'.encode())
+        userName = userNamelookup(id)
+        print('여기탐')
+        while True:
+            while len(data) < payload_size:
+                data += conn.recv(4096)
+            packed_msg_size = data[:payload_size]
+            data = data[payload_size:]
+            msg_size = struct.unpack("L", packed_msg_size)[0]
+            while len(data) < msg_size:
+                data += conn.recv(4096)
+            frame_data = data[:msg_size]
+            data = data[msg_size:]
+            frame = pickle.loads(frame_data)
+            
+            print(frame)
+            insertImageDataToDB(frame, userName)
+    elif login(id, pw) == False:
+        conn.sendall('False'.encode())
 
 
 """디비에서 이미지 가져오기"""
@@ -55,9 +55,9 @@ def getDbImage():
     plt.show()
 
 
-def getImageDataToDB(frame):
+def insertImageDataToDB(frame, userName):
     db = CRUDdatabase()
-    db.insert_FaceDifference(frame)
+    db.insert_FaceDifference(frame, userName)
 
 
 def attendance():
@@ -68,7 +68,7 @@ def attendance():
     #
     pass
 
-
+    
 def login(id, pw):
 
     db = CRUDdatabase()
@@ -80,5 +80,13 @@ def login(id, pw):
         return False
 
 
+def userNamelookup(id):
+    db = CRUDdatabase()
+    userInfo = db.userLookup(id)
+    userInfo = dict(*userInfo)
+    return userInfo['user_name']
+
+
 if __name__ == "__main__":
+
     getDataToImage("127.0.0.1", 9999)
